@@ -1,0 +1,103 @@
+<html>
+    <head>
+        <script language="Javascript" type="text/javascript" src="js/mjz2.js?v=0"></script> 
+        <script language="Javascript" type="text/javascript" src="js/mjz2-movements.js?v=0"></script> 
+        <script language="Javascript" type="text/javascript" src="js/mjz2-resizing.js?v=0"></script> 
+        <link rel="stylesheet" href="css/mjz.css" type="text/css" media="screen">
+
+        <script type="text/javascript">
+            init = function(){
+                
+                var NewXMLHttpRequest = function(){
+                    var xhr = false;
+
+                    if (window.XMLHttpRequest) // native XMLHttpRequest object
+                    {
+                        try { xhr = new XMLHttpRequest(); }
+                        catch(e) { xhr = false; }
+                    }
+                    else if (window.ActiveXObject) // IE/Windows ActiveX version
+                    {
+                        try { xhr = new ActiveXObject("Msxml2.XMLHTTP"); }
+                        catch(e)
+                        {
+                            try { xhr = new ActiveXObject("Microsoft.XMLHTTP"); }
+                            catch(e) { xhr = false; }
+                        }
+                    }
+
+                    return xhr;
+                };
+                
+                var xhr_load = function(){
+                    switch (this.readyState)
+                    {
+                        case 1:
+                            console.log("Open",this);
+                        break;
+                        case 2:
+                            console.log("Send",this);
+                        break;
+                        case 3:
+                            console.log("Receiving",this);
+                        break;
+                        case 4:
+                            if (this.status == 200 || (this.status == 0 && document.location.protocol == "file:")) // OK
+                            {
+                                var text = this.responseText;
+                                console.log("loaded",this,text);
+                            }
+                        break;
+                    }
+                };
+
+                var loadXMLDoc = function(){
+                    var xhr = NewXMLHttpRequest();
+                    if (xhr != false)
+                    {
+                        try
+                        {
+                            xhr.open("GET", "mjz.html", true);
+                            xhr.onreadystatechange = xhr_load;
+                            xhr.setRequestHeader("Connection", "close");
+                            xhr.send(null);
+                        }
+                        catch(e)
+                        {
+                            alert("Error Loading File\n" + e.code + "\n" + e.message);
+                        }
+                    }
+                    else
+                    {
+                        alert("AJAX not supported");
+                    }
+                };
+                
+                var _drag1 = document.getElementById("drag1");
+                var _drag2 = document.getElementById("drag2");
+                var _drag3 = document.getElementById("drag3");
+                var _drag4 = document.getElementById("drag4");
+                var _$$drag1 = $$(_drag1);
+                var _$$drag2 = $$(_drag2);
+                var _$$drag3 = $$(_drag3);
+                var _$$drag4 = $$(_drag4);
+                _$$drag4.on("click",loadXMLDoc);
+                
+            };
+            $$.setClean({cleandeep:true});
+            $$.ready(init);
+
+        </script>
+    </head>
+    <body>
+        <div id="drag1" unselectable="on" class="unselectable" style="width:200px;height:200px;border:1px solid red;">
+            <div id="drag2" unselectable="on" class="unselectable" style="margin:25px;width:150px;height:150px;border:1px solid green;">
+                <div id="drag3" unselectable="on" class="unselectable" style="margin:25px;width:100px;height:100px;border:1px solid blue;position:relative;">
+                    <div id="drag4" unselectable="on" class="unselectable" style="margin:25px;width:50px;height:50px;border:1px solid orange;"></div>
+                </div>
+            </div>
+        </div>
+    </body>
+
+
+</html>

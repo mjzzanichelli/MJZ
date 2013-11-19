@@ -1,0 +1,54 @@
+<html>
+    <head>
+        <script language="Javascript" type="text/javascript" src="js/mjz2.js?v=0"></script> 
+        <script language="Javascript" type="text/javascript" src="js/mjz2-movements.js?v=0"></script> 
+        <script language="Javascript" type="text/javascript" src="js/mjz2-resizing.js?v=0"></script> 
+        <script language="Javascript" type="text/javascript" src="js/mjz2-datepicker.js?v=0"></script> 
+        <link rel="stylesheet" href="css/mjz.css" type="text/css" media="screen">
+
+        <script type="text/javascript">
+            init = function(){
+                var _drag1 = document.getElementById("drag1");
+                var _drag2 = document.getElementById("drag2");
+                var _drag3 = document.getElementById("drag3");
+                var _drag4 = document.getElementById("drag4");
+                var _drag5 = document.getElementById("drag5");
+                var _$$drag1 = $$(_drag1);
+                var _$$drag2 = $$(_drag2);
+                var _$$drag3 = $$(_drag3);
+                var _$$drag4 = $$([_drag4,_drag5]);
+                
+                _$$drag4.install("datepicker",$$datepicker)
+                _$$drag4.on("datepickerselected",function(e,obj){
+                    console.log(e.$$plug["params"]["day"])
+                    obj["datepicker"].remove();
+                    obj["datepicker"].disable()
+                });
+                
+                //var _$$drag5 = $$(_drag5);
+                /*_$$drag5.install("datepicker",datepicker)
+                _$$drag5.on("datepickerselected",function(e,obj){
+                    console.log(e.$$plug["params"]["day"],obj)
+                    obj["datepicker"].remove();
+                    obj["datepicker"].disable()
+                })*/
+                
+            };
+            $$.setClean({cleandeep:true});
+            $$.ready(init);
+
+        </script>
+    </head>
+    <body>
+        <div id="drag1" unselectable="on" class="unselectable" style="width:200px;height:200px;border:1px solid red;">
+            <div id="drag2" unselectable="on" class="unselectable" style="margin:25px;width:150px;height:150px;border:1px solid green;">
+                <div id="drag3" unselectable="on" class="unselectable" style="margin:25px;width:100px;height:100px;border:1px solid blue;position:relative;">
+                    <div id="drag4" unselectable="on" class="unselectable" style="margin:25px 0 0 0;width:50px;height:50px;border:1px solid orange;"></div>
+                    <div id="drag5" unselectable="on" class="unselectable" style="float:left;width:50px;height:50px;border:1px solid orange;"></div>
+                </div>
+            </div>
+        </div>
+    </body>
+
+
+</html>

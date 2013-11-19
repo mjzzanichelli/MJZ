@@ -1,0 +1,93 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+    <head>
+        <script language="Javascript" type="text/javascript" src="js/mjz2.js?v=0"></script> 
+        <script language="Javascript" type="text/javascript" src="js/mjz2-movements.js?v=0"></script> 
+        <script language="Javascript" type="text/javascript" src="js/mjz2-resizing.js?v=0"></script> 
+        <link rel="stylesheet" href="css/mjz.css" type="text/css" media="screen">
+
+        <script type="text/javascript">
+            init = function(){
+                var _dosomething1 = function(e,obj){
+                    alert("1 » "+ this.getAttribute("id"));
+                };
+			
+                var _dosomething2 = function(e,obj){
+                    alert("2 » "+ this.getAttribute("id"));
+                };
+
+                var _drag1 = document.getElementById("drag1");
+                var _drag2 = document.getElementById("drag2");
+                var _drag3 = document.getElementById("drag3");
+                var _drag4 = document.getElementById("drag4");
+                var _$$drag1 = $$(_drag1);
+                var _$$drag2 = $$(_drag2);
+                var _$$drag3 = $$(_drag3);
+                var _$$drag4 = $$(_drag4);
+                _$$drag1.install("draggable",$$draggable);
+                _$$drag2.install("draggable",$$draggable,{"handler": _drag3});
+                //_$$drag3.install("draggable",draggable,{"container":_drag2});
+                _$$drag4.install("draggable",$$draggable,{container:document.body});
+                _$$drag4.install("resizable",$$resizable,{"points":["nw","se"]});
+                /*_$$elm4.on("dragstart",function(e,obj){console.log("start moving",e,obj,this)})
+                _$$elm4.on("dragmove",function(e,obj){console.log("keep moving",e,obj,this)})
+                _$$elm4.on("dragend",function(e,obj){console.log("end moving",e,obj,this)})*/
+    
+                var _drop1 = document.getElementById("drop1");
+                var _drop2 = document.getElementById("drop2");
+                var _drop3 = document.getElementById("drop3");
+                var _drop4 = document.getElementById("drop4");
+                var _$$drop1 = $$(_drop1);
+                var _$$drop2 = $$(_drop2);
+
+                var _$$drop3 = $$(_drop3,{
+                    "install":[
+                        {"droppable":{"tolerance":"contained"}}
+                        , {"resizable":{"points":["n","s","e","w","ne","nw","se","sw"],"container":_drop1}}
+                        , "draggable"
+                    ]
+                });
+                var _$$drop4 = $$(_drop4);
+                _$$drop3.on("dropover",function(){console.log("over")});
+                _$$drop3.on("resizablestart",function(e,obj){console.log(e.$$plug.params.point)});
+
+                //console.log(_$$drop3)
+                /*_$$drop1.install("droppable",droppable,{"tolerance":"contained"});
+                _$$drop2.install("droppable",droppable);
+                _$$drop3.install("droppable",droppable);*/
+                //_$$drop4.install("droppable");
+                //_$$elm4.uninstall("draggable");
+                /*_$$drop1.uninstall("droppable");
+                _$$drop2.uninstall("droppable");
+                _$$drop3.uninstall("droppable");
+                _$$drop4.uninstall("droppable");*/
+                //console.log($$.core.droppable)
+            };
+            $$.install("droppable",$$droppable);
+            $$.install("resizable",$$resizable);
+            $$.install("draggable",$$draggable);
+            $$.setClean({cleandeep:true});
+            $$.ready(init);
+
+        </script>
+    </head>
+    <body>
+        <div id="drag1" unselectable="on" class="unselectable" style="width:200px;height:200px;border:1px solid red;">
+            <div id="drag2" unselectable="on" class="unselectable" style="margin:25px;width:150px;height:150px;border:1px solid green;">
+                <div id="drag3" unselectable="on" class="unselectable" style="margin:25px;width:100px;height:100px;border:1px solid blue;position:relative;">
+                    <div id="drag4" unselectable="on" class="unselectable" style="margin:25px;width:50px;height:50px;border:1px solid orange;"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="drop1" unselectable="on" class="unselectable" style="width:200px;height:200px;border:1px solid red;">
+            <div id="drop2" unselectable="on" class="unselectable" style="margin:25px;width:150px;height:150px;border:1px solid green;">
+                <div id="drop3" unselectable="on" class="unselectable" style="margin:25px;width:100px;height:100px;border:1px solid blue;position:relative;">
+                    <div id="drop4" unselectable="on" class="unselectable" style="margin:25px;width:50px;height:50px;border:1px solid orange;"></div>
+                </div>
+            </div>
+        </div>
+    </body>
+
+
+</html>

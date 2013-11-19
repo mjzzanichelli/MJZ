@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <script language="Javascript" type="text/javascript" src="js/mjz2.js?v=0"></script> 
+        <script language="Javascript" type="text/javascript" src="js/mjz2-movements.js?v=0"></script> 
+        <script language="Javascript" type="text/javascript" src="js/mjz2-resizing.js?v=0"></script> 
+        <script language="Javascript" type="text/javascript" src="js/mjz2-datepicker.js?v=0"></script> 
+        <link rel="stylesheet" href="css/mjz.css" type="text/css" media="screen">
+
+        <script type="text/javascript">
+            init = function(){
+                var $$floating1 = $$("#cont1 .floating");
+                $$floating1.install("movearound",$$movearound,{
+                    "autostart": false
+                    , "container": document.getElementById("cont1")
+                });
+                $$floating1.movearound.start();
+                window.setTimeout(function(){
+                    $$floating1.movearound.stop();
+                }, 6000);
+                
+                var $$floating2 = $$("#cont2  .floating");
+                $$floating2.install("movearound",$$movearound);
+                $$floating2.movearound.start();
+                
+                var $$floating3 = $$("#cont3 .floating");
+                $$floating3.install("movearound",$$movearound);
+                $$floating3.movearound.start();
+                window.setTimeout(function(){
+                    $$floating2.movearound.stop();
+                }, 1100);
+                window.setInterval(function(){
+                    $$floating3.movearound.start();
+                },2000);
+                
+            };
+            
+            $$.setClean({cleandeep:true});
+            $$.ready(init);
+
+        </script>
+        <style>
+            .floating{
+                position:absolute;
+                width:20px;
+                height:20px;
+                border:1px solid fuchsia;
+                background-color:darkred
+            }
+        </style>
+    </head>
+    <body>
+        <div id="cont1" unselectable="on" class="unselectable" style="width:40px;height:30px;border:1px solid green;position:relative;">
+            <div class="floating"></div>
+        </div>
+        <div id="cont2" unselectable="on" class="unselectable" style="width:200px;height:200px;border:1px solid red;position:relative;">
+            <div class="floating"></div>
+            <div class="floating"></div>
+        </div>
+        
+        <div id="cont3" unselectable="on" class="unselectable" style="width:300px;height:300px;border:1px solid coral;position:relative;">
+            <div class="floating"></div>
+            <div class="floating"></div>
+            <div class="floating"></div>
+        </div>
+    </body>
+
+
+</html>

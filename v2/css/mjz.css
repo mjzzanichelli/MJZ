@@ -1,0 +1,120 @@
+.unselectable, .li-unselectable > li, .all-unselectable *{
+    -moz-user-select: -moz-none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.mjz-draggable{
+    z-index:1000;
+}
+.mjz-droppable-over{
+    background-color:#cccccc;
+    color:red;
+}
+
+.mjz-handler{
+    position:absolute;
+    margin:0;
+    padding:0;
+    cursor:pointer;
+}
+
+.mjz-handler.resizable-n{
+    top:0px;
+    left:2px;
+    border-top:2px solid black;
+}
+
+.mjz-handler.resizable-s{
+    bottom:0px;
+    left:2px;
+    border-bottom:2px solid black;
+}
+
+.mjz-handler.resizable-e{
+    top:2px;
+    right:0;
+    border-right:2px solid black;
+}
+
+.mjz-handler.resizable-w{
+    top:2px;
+    left:0;
+    border-left:2px solid black;
+}
+
+.mjz-handler.resizable-ne{
+    top:0;
+    right:0;
+    border-top:10px solid black;
+    border-right:10px solid black;
+}
+
+.mjz-handler.resizable-nw{
+    top:0;
+    left:0;
+    border-top:10px solid black;
+    border-left:10px solid black;
+    
+}
+
+.mjz-handler.resizable-se{
+    bottom:0;
+    right:0;
+    border-bottom:10px solid black;
+    border-right:10px solid black;
+}
+
+.mjz-handler.resizable-sw{
+    bottom:0;
+    left:0;
+    border-bottom:10px solid black;
+    border-left:10px solid black;
+}
+
+.mjz-datepicker{
+    position:absolute;
+    display:none;
+    font:normal 400 10px arial,sans-serif;
+    line-height:14px;
+}
+
+.mjz-datepicker .menu-container,.mjz-datepicker .days-container{
+    overflow:hidden;
+}
+
+.mjz-datepicker .menu-container .menu-label{
+    overflow:hidden;
+    text-align:center;
+}
+
+.mjz-datepicker .menu-container .menu-prev, .mjz-datepicker .menu-container .menu-next{
+    height:15px;
+    float:left;
+    cursor:pointer;
+}
+
+.mjz-datepicker .menu-container .menu-next{
+    float:right;
+}
+
+.mjz-datepicker .days-container ul.week-row{
+    list-style:none;
+    margin:0;
+    padding:0;
+    clear:both;
+}
+
+.mjz-datepicker .days-container ul.week-row li.week-day{
+    list-style-type:none;
+    margin:0;
+    padding:0;
+    float:left;
+    line-height:18px;
+    height:18px;
+    width:18px;
+    text-align:center;
+    cursor:pointer;
+}

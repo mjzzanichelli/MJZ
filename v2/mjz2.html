@@ -1,0 +1,125 @@
+<html>
+    <head>
+        <script language="Javascript" type="text/javascript" src="js/mjz2.js"></script> 
+        <script language="Javascript" type="text/javascript" src="js/mjz2-movements.js"></script> 
+        <script language="Javascript" type="text/javascript" src="js/mjz2-resizing.js"></script> 
+        <link rel="stylesheet" href="css/mjz.css" type="text/css" media="screen">
+
+        <script type="text/javascript">
+        init = function(){
+                var _link = $$(document.getElementById("link"));
+                var _list = $$(document.getElementById("list"));
+                var _cont = $$(document.getElementById("container"));
+                var _items;
+                var _handleItem = function(e,obj){
+                        e = e || window.event;
+                        var target = e.target || e.srcElement;
+                        alert(target.innerHTML);
+                        e.stopPropagation ? e.stopPropagation() : e.cancelBubble = true;
+                };
+                var _handleItemAgain = function(e,obj){
+                        e = e || window.event;
+                        var target = e.target || e.srcElement;
+                        alert(target.innerHTML);
+                        e.stopPropagation ? e.stopPropagation() : e.cancelBubble = true;
+                };
+                var _handleList = function(e,obj){
+                    var i = 5000
+                    , _item
+                    , _helper = function(){return '<div>helper '+ this.getAttribute("id")+'</div>';}
+                    , _sorter = function(){return '<li unselectable="on" style="width:50px;height:64px;border:1px solid green;display:block">sorter<br/>'+ this.getAttribute("id")+'</li>';}
+                    ;
+                        if (_link.html()=="add") {
+                                var _d1 = new Date();
+                                while (i--) {
+                                        _item = document.createElement('LI');
+                                        _item.setAttribute("id",i)
+                                        _item.setAttribute("unselectable","on")
+                                        _item.innerHTML = i;
+                                        _list.elements[0].appendChild(_item);
+                                }
+                                _items = $$(_list.children());
+                                _items.css({"width":"50px","border":"1px solid red"});
+                                /*
+                                _items.install("draggable",$$draggable,{
+                                    "helper":"<div>helper</div>"
+                                    , "scrollable":_cont.elements[0]
+                                    , "container": _list.elements[0]
+                                });
+                                _items.install("droppable",$$droppable,{"tolerance":"intersect"});
+                                _items.on("dragstart",function(e,obj){
+                                    console.log("dragstart",e.$$plug,this)
+                                });
+                                _items.on("dragmove",function(e,obj){
+                                    console.log("dragmove",e.$$plug,this)
+                                });
+                                _items.on("dragstop",function(e,obj){
+                                    console.log("dragstop",e.$$plug,this)
+                                });
+                                _items.on("dropover",function(e,obj){
+                                    console.log("dropover",e.$$plug,this)
+                                });
+                                _items.on("dropout",function(e,obj){
+                                    console.log("dropout",e.$$plug,this)
+                                });
+                                _items.on("dropin",function(e,obj){
+                                    console.log("dropin",e.$$plug,this)
+                                });
+                                */
+                               _items.install("sortable",$$sortable,{
+                                    "helper": _helper
+                                    , "sorter": _sorter
+                                    , "scrollable": _cont.elements[0]
+                                    , "container": _list.elements[0]
+                                    , "block-x": true
+                               });
+                                
+                                //_items.install("resizable",$$resizable)
+                                //_items.on("click",_handleItem);
+                                var _d2 = new Date();
+                                alert((_d2.getTime()-_d1.getTime()));
+                                _link.html("remove");
+                        }  else {
+                                var _d1 = new Date();
+                                //_items = $$(_list.children());
+                                
+                                /*_items.uninstall("draggable");
+                                _items.uninstall("droppable");*/
+//TODO:uninstall automatically
+                                _cont.html("");
+                                //_list.html("");
+                                //_items.remove({clean:true})
+                                _items = null;
+                                _helper = null;
+                                _sorter = null;
+                                _list = document.createElement('ul');
+                                _list.setAttribute("id","list");
+                                _list.setAttribute("unselectable","on");
+                                _cont.elements[0].appendChild(_list);
+                                _list = $$(_list);
+                                _list.addClass("li-unselectable test");
+                                _list.css({
+                                    "width":"200px"
+                                    , "border": "1px solid green"
+                                });
+                                var _d2 = new Date();
+                                alert((_d2.getTime()-_d1.getTime()));
+                                _link.html("add");
+                        }
+
+                };
+                _link.on("click",_handleList);
+        };
+        $$.setClean({clean:true});
+        $$.ready(init);
+
+    </script>
+    </head>
+    <body>
+        <a href="javascript:;" id="link">add</a>
+        <div id="container" class="unselectable" style="height:500px;overflow-y:auto;position:relative;border:1px solid red">
+            <ul id="list" class="li-unselectable" style="width:200px;border:1px solid green"></ul>
+        </div>
+        
+    </body>
+</html>
