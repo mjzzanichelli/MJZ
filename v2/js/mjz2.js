@@ -1,6 +1,6 @@
 var $$ = (
     function(){
-    	
+
     	if ($$) return $$;
     	
     	var _self = function(selector,params){
@@ -1069,6 +1069,170 @@ var $$ = (
 				}
 				return _elements;
 			}
+			
+			, send: function(params) {
+				params = $$.extend({
+					"method" : "GET"
+					, "dataType": "application/x-www-form-urlencoded"
+				}, params, true);
+				if (params["url"]) {
+					var xmlhttp;
+					if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari
+						xmlhttp = new XMLHttpRequest();
+					} else {// code for IE6, IE5
+						xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+					}
+					
+					xmlhttp.onreadystatechange = function() {
+						if (xmlhttp.readyState == 4) {
+							if (xmlhttp.status == 200)
+								if (params["success"]) params["success"](xmlhttp.responseText);
+								else {
+									if (params["error"]) params["error"](xmlhttp);
+								}
+						} else if (xmlhttp.readyState == 2 && xmlhttp.status !== 200 && params["error"]) params["error"];
+					};
+					try {
+						xmlhttp.open(params["method"], params["url"], true);
+						if (params["method"].toUpperCase()=="POST" && params["data"]){
+							xmlhttp.setRequestHeader("Content-type",params["dataType"]);
+							//console.log($$.stringify(params["data"]))
+							xmlhttp.send($$.stringify(params["data"]));
+						} else xmlhttp.send();
+					} catch(e) {
+						if (params["error"]) params["error"](e);
+					}
+				}
+			}
+		
+			, addJS: function(params) {
+				if (params && params["path"]) {
+					var _script = document.createElement("SCRIPT"), _cont = params["cont"] || document.getElementsByTagName("HEAD")[0];
+					_script.src = params["path"];
+					_script.type = "text/javascript";
+					if (params["id"])
+						_script.id = params["id"];
+					if (params["callback"]) {
+						_script.onreadystatechange = function() {
+							if (this.readyState == 'complete') params["callback"]();
+						};
+						_script.onload = params["callback"];
+					}
+					_cont.appendChild(_script);
+				}
+			}
+		
+			, addCSS: function(params) {
+				if (params && params["path"]) {
+					var _style = document.createElement("LINK"), _cont = params["cont"] || document.getElementsByTagName("HEAD")[0];
+					_style.href = params["path"];
+					_style.type = "text/css";
+					_style.rel = "stylesheet";
+					if (params["id"])
+						_style.id = params["id"];
+					if (params["callback"]) {
+						_style.onreadystatechange = function() {
+							if (this.readyState == 'complete') params["callback"]();
+						};
+						_style.onload = params["callback"];
+					}
+					_cont.appendChild(_style);
+				}
+			}
+			
+			, FS: (function(properties,methods){
+				var _FS = {"obj":null,"www":{},"upload":null,"err":function(e) {console.log(e);}}
+					, errorHandler = function(e) {
+						  var msg = '';
+						  switch (e.code) {
+						    case FileError.QUOTA_EXCEEDED_ERR:
+						      msg = 'QUOTA_EXCEEDED_ERR';
+						      break;
+						    case FileError.NOT_FOUND_ERR:
+						      msg = 'NOT_FOUND_ERR';
+						      break;
+						    case FileError.SECURITY_ERR:
+						      msg = 'SECURITY_ERR';
+						      break;
+						    case FileError.INVALID_MODIFICATION_ERR:
+						      msg = 'INVALID_MODIFICATION_ERR';
+						      break;
+						    case FileError.INVALID_STATE_ERR:
+						      msg = 'INVALID_STATE_ERR';
+						      break;
+						    default:
+						      msg = 'Unknown Error';
+						      break;
+						  };
+						  console.log('Error: ' + msg);
+						};
+				;
+
+				_FS.www.requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem;
+		    	_FS.www.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder || window.MSBlobBuilder;
+				_FS.www.URL = window.URL || window.webkitURL;
+		
+				if (_FS.www.requestFileSystem) {
+					_FS.www.requestFileSystem.call(window,window.TEMPORARY, 1024*1024, function(fs) {
+						
+						_FS.upload = function(params,success,error){
+							params = {
+								"url": params["url"]
+								, "file": params["file"]
+								, "name": params["name"] || "fileName"
+								, "method": params["method"] || "POST"
+								, "folder": (params["folder"] ? params["folder"]+"/" : "")
+							};
+							if (params && params["url"] && params["file"]){
+								fs.root.getFile(
+									params["file"].name
+									, { create: true }
+									, function(fileEntry) {
+										fileEntry.createWriter(function(writer) {
+											writer.onerror = _FS.err;
+											var fr = new FileReader;
+											fr.onloadend = function(a) {
+												var boundary=Math.random().toString().substr(2);
+												var body = "";
+											 	body += "--" + boundary
+													+ "\r\nContent-Disposition: form-data; name="+ params["name"] +"; filename="+ params["folder"] + params["file"].name
+										           	+ "\r\nContent-type: application/octet-stream"
+										           	+ "\r\n\r\n" + this.result + "\r\n"
+										           	+ "\r\n\r\n--" + boundary + "--\r\n";
+												_dataType = "multipart/form-data; boundary="+boundary;
+												_public.send({
+													"method" : params["method"],
+													"url" : params["url"],
+													"data": body,
+													"dataType": _dataType,
+													"error" : function(data) {
+														if (error) {
+															data = eval('(' + data + ')');
+															error(data);
+														}
+													},
+													"success": function(data){
+														if (success) {
+															data = eval('(' + data + ')');
+															success(data);
+														}
+													}
+												});
+											};
+											fr.onerror = _FS.err;
+						                    fr.readAsBinaryString(params["file"]);
+										},_FS.err);
+									},_FS.err
+								);
+							} else return;
+						};
+						_FS.obj = fs;
+					},errorHandler);
+				}
+				
+				return _FS;
+		
+			})()
     	};
     	
     	var Instance = (function(){
