@@ -118,3 +118,23 @@
     text-align:center;
     cursor:pointer;
 }
+
+
+
+
+
+
+.mjz-tooltip{
+    position:absolute;
+    display:none;
+    font:normal 400 10px arial,sans-serif;
+    line-height:14px;
+    overflow: hidden;
+    
+}
+
+.mjz-tooltip .body-container{
+	display:block;
+	text-align:center;
+	border:1px solid red;
+}
