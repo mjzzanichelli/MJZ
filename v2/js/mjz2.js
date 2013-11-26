@@ -6,7 +6,8 @@ var $$ = (
     	var _self = function(selector,params){
     		return _private.setInstance(selector,params);
     	};
-    	
+
+//$$ private members
     	var _private = {
     		unique : 0
             , mutational: (document.implementation.hasFeature('MutationEvents','2.0') || window.MutationEvent)
@@ -95,6 +96,8 @@ var $$ = (
 		     }
 	        
 	        , setInstanceProperties : function(){
+
+//$$() instance members
 	        	var _properties = {
 	                installations:{}
                 	, removed: false
@@ -189,7 +192,8 @@ var $$ = (
 
 	                , html: function(value,params){
 	                    var _elements = (params && params.elements ? params.elements : this.elements)
-	                    ,i=_elements.length;
+	                    	, i=_elements.length
+	                    ;
 	                    if (value!==undefined){
 	                        while (i--){
 	                            _private.cleanChildNodes(_elements[i],params);
@@ -198,6 +202,15 @@ var $$ = (
 	                    }
 	                    _elements = i = null;
 	                    return this.elements[0].innerHTML;
+	                }
+	                
+	                , val: function(value,params){
+	                    var _elements = (params && params.elements ? params.elements : this.elements)
+	                    	, i=_elements.length
+	                    ;
+	                    if (value!==undefined) while (i--) _elements[i].value = value;
+	                    _elements = i = null;
+	                    return this.elements[0].value;
 	                }
 	                
 	                , append: function(value,params){
@@ -415,12 +428,30 @@ var $$ = (
 	                    return this;
 	                }
 	                
+	                , hasClass: function(className,params){
+	                	var _elements = (params && params.elements ? params.elements : this.elements)
+	                	, i=_elements.length
+	                    , _classes= (className!==undefined?className.replace(/ +(?= )/g,'').split(" "):[])
+	                    , ii = _classes.length
+	                    , _hasClass = true
+	                    ;
+	                    if (ii>0){
+	                    	while (i--){
+		                        while (ii--) {
+		                        	_hasClass = _public.hasClass(_elements[i],_classes[ii]);
+		                        	if (!_hasClass)ii=0;
+		                        }
+		                        ii = _classes.length;
+	                       }
+	                    }
+	                    _elements = i = _classes = ii = null;
+	                    return _hasClass;
+	                }
+
 	                , position: function(params){
 	                    var _element = (params && params.element ? params.element : this.elements[0]);
 	                    return _public.getPosition(_element);
 	                }
-	                
-	                
 	                
                };
                return _public.extend(this.prototype,_properties);
@@ -637,7 +668,8 @@ var $$ = (
 	        }
 	        
     	};
-    	
+
+//$$ public members    	
     	var _public = {
     		ready: function(callback){
             	var _eventName = document.addEventListener ? "DOMContentLoaded" : "readystatechange"
@@ -1070,7 +1102,9 @@ var $$ = (
 				return _elements;
 			}
 			
-			, send: function(params) {
+			, send: function(params,success,error) {
+				params["success"] = params["success"] || success;
+				params["error"] = params["error"] || error;
 				params = $$.extend({
 					"method" : "GET"
 					, "dataType": "application/x-www-form-urlencoded"
@@ -1085,12 +1119,16 @@ var $$ = (
 					
 					xmlhttp.onreadystatechange = function() {
 						if (xmlhttp.readyState == 4) {
-							if (xmlhttp.status == 200)
+							if (xmlhttp.status == 200){
 								if (params["success"]) params["success"](xmlhttp.responseText);
-								else {
-									if (params["error"]) params["error"](xmlhttp);
-								}
-						} else if (xmlhttp.readyState == 2 && xmlhttp.status !== 200 && params["error"]) params["error"];
+							}
+							else {
+								if (params["error"]) params["error"](xmlhttp);
+							}
+						} else if (xmlhttp.readyState == 2 && xmlhttp.status !== 200 && params["error"]) {
+							params["error"](xmlhttp);
+							params["error"] = null;
+						}
 					};
 					try {
 						xmlhttp.open(params["method"], params["url"], true);
@@ -1105,13 +1143,14 @@ var $$ = (
 				}
 			}
 		
-			, addJS: function(params) {
+			, addJS: function(params,callback) {
 				if (params && params["path"]) {
 					var _script = document.createElement("SCRIPT"), _cont = params["cont"] || document.getElementsByTagName("HEAD")[0];
 					_script.src = params["path"];
 					_script.type = "text/javascript";
 					if (params["id"])
 						_script.id = params["id"];
+					params["callback"] = params["callback"] || callback;
 					if (params["callback"]) {
 						_script.onreadystatechange = function() {
 							if (this.readyState == 'complete') params["callback"]();
@@ -1122,7 +1161,7 @@ var $$ = (
 				}
 			}
 		
-			, addCSS: function(params) {
+			, addCSS: function(params,callback) {
 				if (params && params["path"]) {
 					var _style = document.createElement("LINK"), _cont = params["cont"] || document.getElementsByTagName("HEAD")[0];
 					_style.href = params["path"];
@@ -1130,6 +1169,7 @@ var $$ = (
 					_style.rel = "stylesheet";
 					if (params["id"])
 						_style.id = params["id"];
+					params["callback"] = params["callback"] || callback;
 					if (params["callback"]) {
 						_style.onreadystatechange = function() {
 							if (this.readyState == 'complete') params["callback"]();
@@ -1182,6 +1222,8 @@ var $$ = (
 								, "name": params["name"] || "fileName"
 								, "method": params["method"] || "POST"
 								, "folder": (params["folder"] ? params["folder"]+"/" : "")
+								, "success": params["success"] || success
+								, "error": params["error"] || error
 							};
 							if (params && params["url"] && params["file"]){
 								fs.root.getFile(
@@ -1206,15 +1248,15 @@ var $$ = (
 													"data": body,
 													"dataType": _dataType,
 													"error" : function(data) {
-														if (error) {
+														if (params["error"]) {
 															data = eval('(' + data + ')');
-															error(data);
+															params["error"](data);
 														}
 													},
 													"success": function(data){
-														if (success) {
+														if (params["success"]) {
 															data = eval('(' + data + ')');
-															success(data);
+															params["success"](data);
 														}
 													}
 												});

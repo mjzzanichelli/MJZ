@@ -20,9 +20,10 @@ var $$datepicker = function(){
     , _createDatePickerDays = function(container,weeks){
         container.html("",{cleandeep:true});
         var i = -1
-        , ii
-        , _week
-        , _day
+	        , ii
+	        , _week
+	        , _day
+        ;
         while(i++<weeks.length-1){
             ii = -1;
             _week = $$(container.append('<ul class="week-row"/>'));
@@ -33,9 +34,9 @@ var $$datepicker = function(){
                     function(day){
                         _day.on("click",function(e,obj){
                             _self.trigger(_name+"selected",{elements:[_private["element"]],day:day});
-                        })
+                        });
                     }
-                )(new Date(weeks[i][ii]))
+                )(new Date(weeks[i][ii]));
             }
         }
         i = ii = _week = _day = null;
@@ -53,7 +54,7 @@ var $$datepicker = function(){
         , _menu_label = $$(container.append('<div class="menu-label"/>'))
         ;
         
-        _menu_label.html($$.getMonthName(_method.current_date.getMonth()))
+        _menu_label.html($$.getMonthName(_method.current_date.getMonth()));
         _menu_prev.html("prev");
         _menu_next.html("next");
 
@@ -82,7 +83,7 @@ var $$datepicker = function(){
             "left": (_element_offset[0]+_element_size[0]).toString()+"px"
             , "top": _element_offset[1].toString()+"px"
             , "display": "block"
-        })
+        });
         _method.active = true;
         _method.container = _datepicker_container;
         
@@ -164,7 +165,6 @@ var $$datepicker = function(){
             //console.log("datepicker destroyed on ", _self)
             _name = _params = _private = _createDatePickerDays = _setMenuNavigation = _createDatePickerMenu = _createDatePicker = _setWeekDates = _checkDatepickerStatus =_setDatePicker = _method = null;
         }
-    }
+    };
     return _method;
-}
-
+};
