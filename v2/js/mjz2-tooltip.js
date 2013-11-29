@@ -7,6 +7,8 @@ var $$tooltip = function(){
         , "open": "mouseover"
         , "close": "mouseout"
         , "effect": "show"
+        , "width": null
+        , "position": "center"
         , "toggle": true
         , "delay": null
         , "wait": null
@@ -144,21 +146,40 @@ var $$tooltip = function(){
 
     , _createTooltip = function(){
         _removeEffect();
-        /*_removeOpening();
-        _removeClosing();*/
+        _removeOpening();
+        _removeClosing();
         
         var _element_offset = $$.getOffset(_private["element"])
 	        , _element_size = [_private["element"].offsetWidth,_private["element"].offsetHeight]
 	        , _tooltip_container = $$(_params["container"].append('<div class="mjz-tooltip"/>'))
+	        , _width
+	        , _left
         ;
         _private["body_container"] = $$(_tooltip_container.append('<div class="body-container"/>'));
         _createTooltipBody(_private["body_container"]);
-        _tooltip_container.css({
-            "left": (_element_offset[0]+(_element_size[0]/2)-(parseInt(_params["width"],10)/2)).toString()+"px"
-            , "top": (_element_offset[1]+_element_size[1]).toString()+"px"
-            , "width": _params["width"].toString().replace("px","")+"px"
-            , "display": "block"
+       _tooltip_container.css({
+            "display": "block"
             , "visibility": "hidden"
+        });
+        if (_params["width"]){
+        	if (_params["width"]=="origin") _width = _element_size[0];
+        	else if (!isNaN(parseInt(_params["width"],10))) _width = parseInt(_params["width"],10);
+        } else _width = _tooltip_container.elements[0].offsetWidth;
+        switch(_params["position"]){
+        	case "center":
+        			_left = (_element_offset[0]+(_element_size[0]/2)-(_width/2)).toString()+"px";
+        		break;
+        	case "left":
+        			_left = _element_offset[0].toString()+"px";
+        		break;
+        	case "right":
+        			_left = (_element_offset[0]+_element_size[0]-_width).toString()+"px";
+        		break;
+        }
+        _tooltip_container.css({
+        	"left": _left
+            , "top": (_element_offset[1]+_element_size[1]).toString()+"px"
+            , "width": _width.toString()+"px"
         });
         _method.active = true;
         _method.container = _tooltip_container;
@@ -173,6 +194,7 @@ var $$tooltip = function(){
         var _remove = function(){
 	        _removeEffect();
 	        _removeClosing();
+	        _removeOpening();
 	        //console.log(_element,_private["element"])
 	        //_private["element"] = null;
 	        if (_method.container){
