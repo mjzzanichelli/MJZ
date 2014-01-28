@@ -672,12 +672,19 @@ var $$ = (
 //$$ public members    	
     	var _public = {
     		ready: function(callback){
-            	var _eventName = document.addEventListener ? "DOMContentLoaded" : "readystatechange"
-	            , _helper = function(){
-	                _private.removeEvent(document,_eventName,_helper);
-	                if (callback) callback();
-	            };
-	            _private.addEvent(document,_eventName,_helper);
+            	if (document.readyState == "complete")callback(document.readyState);
+            	else {
+	            	var _eventName = document.addEventListener ? "DOMContentLoaded" : "readystatechange"
+		            , _helper = function(){
+		            	if (document.readyState == "complete"){
+			                _private.removeEvent(document,_eventName,_helper);
+							_private.removeEvent(window,"load",_helper);
+			                if (callback) callback(document.readyState);
+		               }
+		            };
+		            _private.addEvent(document,_eventName,_helper);
+					_private.addEvent(window,"load",_helper);
+	            }
 	        }
 	        
 	        , install: function(name,fn,params){
@@ -1289,7 +1296,6 @@ var $$ = (
 	            return this;
 	        };
 	        Instance.prototype = _private.setInstanceProperties.call(Instance);
-		
 	        return Instance;
 	     })();
 		     
