@@ -1139,6 +1139,7 @@ var $$ = (
 					};
 					try {
 						xmlhttp.open(params["method"], params["url"], true);
+						xmlhttp.withCredentials = params["withCredentials"] || false;
 						if (params["method"].toUpperCase()=="POST" && params["data"]){
 							xmlhttp.setRequestHeader("Content-type",params["dataType"]);
 							//console.log($$.stringify(params["data"]))
