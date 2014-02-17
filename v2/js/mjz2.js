@@ -362,7 +362,7 @@ var $$ = (
 	                        switch(_public.getType(attrs)){
 	                            case "object":
 	                                _public.setAttributes(_elements[i],attrs);
-	                                return this;
+	                                if(i==0) return this;
 	                                break;
 	                            case "array":
 	                                return _public.getAttributes(_elements[i],attrs);
@@ -383,7 +383,7 @@ var $$ = (
 	                        switch(_public.getType(css)){
 	                            case "object":
 	                                _public.setStyle(_elements[i],css);
-	                                return this;
+	                                if(i==0) return this;
 	                                break;
 	                            case "array":
 	                                return _public.getStyle(_elements[i],css);
