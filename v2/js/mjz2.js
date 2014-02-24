@@ -14,6 +14,7 @@ var $$ = (
             //, mutational: false
             , allowclean: true
             , isIE: (document.all ? true : false)
+            , features:{}
             , clean: false
             , cleandeep: false
             , cleanremove: false
@@ -130,7 +131,6 @@ var $$ = (
 	                                    }
 	                                };
 	                            })(_element);
-	                            //console.log(_helper)
 	                            if (!_element.$$plug.listeners[this.unique]) _element.$$plug.listeners[this.unique] = {};
 	                            if (!_element.$$plug.listeners[this.unique][eventName]) _element.$$plug.listeners[this.unique][eventName] = new Array;
 	                            _element.$$plug.listeners[this.unique][eventName].push([helper,_helper]);
@@ -362,7 +362,7 @@ var $$ = (
 	                        switch(_public.getType(attrs)){
 	                            case "object":
 	                                _public.setAttributes(_elements[i],attrs);
-	                                if(i==0) return this;
+	                                if (i == 0) return this;
 	                                break;
 	                            case "array":
 	                                return _public.getAttributes(_elements[i],attrs);
@@ -383,7 +383,7 @@ var $$ = (
 	                        switch(_public.getType(css)){
 	                            case "object":
 	                                _public.setStyle(_elements[i],css);
-	                                if(i==0) return this;
+	                                if (i==0) return this;
 	                                break;
 	                            case "array":
 	                                return _public.getStyle(_elements[i],css);
@@ -548,7 +548,8 @@ var $$ = (
 	            onmousemove:1,
 	            onmouseout:1,
 	            onmouseover:1,
-	            onmouseup:1
+	            onmouseup: 1,
+	            onresize:1
 	        }
 	        
 	        , setNodeRemoved: function(callback){
@@ -687,19 +688,26 @@ var $$ = (
 	            }
 	        }
 	        
+            , addEvent: _private.addEvent
+    		
 	        , install: function(name,fn,params){
-	            if (params && params.destroy) $$.core.uninstall(name);
+	            if (params && params.destroy) _public.uninstall(name);
 	            _private.plugins[name] = {setup:fn,objects:new Array};
+	            return _public.extend({},_private.plugins[name]);
 	        }
 			
 	        , uninstall: function(name,params){
 	            if (_private.plugins[name]) {
-	                if ($$.core.plugins[name].objects.length>0){
+	                if (_private.plugins[name].objects.length>0){
 	                    var i=_private.plugins[name].objects.length;
 	                    while(i--)_private.plugins[name].objects.uninstall(name,params);
 	                }
 	                delete _private.plugins[name];
 	            }
+	        }
+	        
+	        , getInstallations: function(name){
+	        	return _public.extend({},(name ? _private.plugins[name] : _private.plugins));
 	        }
 
 	        , setClean: function(params){
@@ -708,6 +716,7 @@ var $$ = (
 	            _private.clean = (!_private.cleandeep ? (params!==undefined && params.clean!==undefined ? params.clean : _private.clean) : _private.cleandeep);
 	            _private.cleanremove =  (params!==undefined && params.cleanremove!==undefined ? params.cleanremove : _private.cleanremove);
 	            _private.allowclean =  (params!==undefined && params.allowclean!==undefined ? params.allowclean : _private.allowclean);
+	            return _public.getClean();
 	        }
 	        
 	        , getClean: function(){
@@ -777,7 +786,7 @@ var $$ = (
 	            else if (object.nodeType !== undefined) {
 	                _type = "html";
 	            }
-	            stringConstructor = arrayConstructor =  objectConstructor = null;
+	            stringConstructor = arrayConstructor =  objectConstructor = functionConstructor = null;
 	            return _type;
 	        }
 	        
@@ -812,6 +821,12 @@ var $$ = (
 	            return _attributes;
 	        }
 	        
+	        , setAttributes: function(element,params){
+	            var attr;
+	            for (attr in params)element.setAttribute(attr,params[attr]);
+	            attr = null;
+	        }
+	        
 	        , getElementIndex: function(element,group){
 	            var _group = group || _public.getSubNodes(element.parentNode)
 	            , i=_group.length;
@@ -821,19 +836,6 @@ var $$ = (
 	            return i;
 	        }
 	        
-	        , setAttributes: function(element,params){
-	            var attr;
-	            for (attr in params)element.setAttribute(attr,params[attr]);
-	            attr = null;
-	        }
-	        
-	        , getAttributes: function(element,params){
-	            var _attributes={},params = (_public.isArray(params) ? params : [params]),i=params.length;
-	            while(i--) _attributes[params[i]] = element.getAttribute(params[i]);
-	            params = i = null;
-	            return _attributes;
-			}
-
 	        , setFunctionFormat: function(string){
 	            for(var exp=/-([a-z])/;exp.test(string);string=string.replace(exp,RegExp.$1.toUpperCase()));
 	            return string;
@@ -872,7 +874,7 @@ var $$ = (
 	        }
 	        
 	        , trim: function(string){
-	          return string.replace(/^\s+|\s+$/g, '');
+	          return (string || "").replace(/^\s+|\s+$/g, '');
 	        }
         	
         	, loopEach: function(elements,action){
@@ -897,7 +899,15 @@ var $$ = (
 	            return _pos;
 	        }
 	        
-	        , getPosition: function(object, offset){
+            , getPageSize: function() {
+                var body = document.body,
+                    html = document.documentElement,
+                    width = Math.max(body.scrollWidth, body.offsetWidth,html.clientWidth, html.scrollWidth, html.offsetWidth),
+                    height = Math.max(body.scrollHeight, body.offsetHeight,html.clientHeight, html.scrollHeight, html.offsetHeight);
+                return [width, height];
+            }
+            
+    		, getPosition: function (object, offset) {
 	            var _offset = offset || [0,0],_ret = _offset;
 	            if (object) {
 	                _offset[0] += object.offsetLeft;
@@ -1022,7 +1032,6 @@ var $$ = (
 	        }
         
 	        , getElementsByPseudo: function(elms,pseudo){
-				//console.log(pseudo)
 				var i=elms.lengths;
 				if (isNaN(pseudo)){
 					switch(pseudo){
@@ -1115,6 +1124,7 @@ var $$ = (
 				params = $$.extend({
 					"method" : "GET"
 					, "dataType": "application/x-www-form-urlencoded"
+					, "stringify": true
 				}, params, true);
 				if (params["url"]) {
 					var xmlhttp;
@@ -1123,7 +1133,6 @@ var $$ = (
 					} else {// code for IE6, IE5
 						xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
 					}
-					
 					xmlhttp.onreadystatechange = function() {
 						if (xmlhttp.readyState == 4) {
 							if (xmlhttp.status == 200){
@@ -1138,12 +1147,11 @@ var $$ = (
 						}
 					};
 					try {
-						xmlhttp.open(params["method"], params["url"], true);
-						xmlhttp.withCredentials = params["withCredentials"] || false;
+					    xmlhttp.open(params["method"], params["url"], true);
+					    xmlhttp.withCredentials = params["withCredentials"] || false;
 						if (params["method"].toUpperCase()=="POST" && params["data"]){
 							xmlhttp.setRequestHeader("Content-type",params["dataType"]);
-							//console.log($$.stringify(params["data"]))
-							xmlhttp.send($$.stringify(params["data"]));
+							xmlhttp.send(params["stringify"] ? $$.stringify(params["data"]) : params["data"]);
 						} else xmlhttp.send();
 					} catch(e) {
 						if (params["error"]) params["error"](e);
@@ -1171,20 +1179,20 @@ var $$ = (
 		
 			, addCSS: function(params,callback) {
 				if (params && params["path"]) {
-					var _style = document.createElement("LINK"), _cont = params["cont"] || document.getElementsByTagName("HEAD")[0];
-					_style.href = params["path"];
-					_style.type = "text/css";
-					_style.rel = "stylesheet";
+					var _css = document.createElement("LINK"), _cont = params["cont"] || document.getElementsByTagName("HEAD")[0];
+					_css.href = params["path"];
+					_css.type = "text/css";
+					_css.rel = "stylesheet";
 					if (params["id"])
-						_style.id = params["id"];
+						_css.id = params["id"];
 					params["callback"] = params["callback"] || callback;
 					if (params["callback"]) {
-						_style.onreadystatechange = function() {
+						_css.onreadystatechange = function() {
 							if (this.readyState == 'complete') params["callback"]();
 						};
-						_style.onload = params["callback"];
+						_css.onload = params["callback"];
 					}
-					_cont.appendChild(_style);
+					_cont.appendChild(_css);
 				}
 			}
 			
@@ -1283,6 +1291,31 @@ var $$ = (
 				return _FS;
 		
 			})()
+			
+			, hasFeature: function (featurename) {
+				if (_private["features"].hasOwnProperty(featurename)) return _private["features"][featurename];
+				else{
+				
+					var feature = false,
+					domPrefixes = 'Webkit Moz ms O'.split(' '),
+					elm = document.createElement('div'),
+					featurenameCapital = null;
+					featurename = featurename.toLowerCase();
+					if (elm.style[featurename]) { feature = true; }
+					if (feature === false) {
+						featurenameCapital = featurename.charAt(0).toUpperCase() + featurename.substr(1);
+						for (var i = 0; i < domPrefixes.length; i++) {
+							if (elm.style[domPrefixes[i] + featurenameCapital] !== undefined) {
+								feature = true;
+								break;
+							}
+						}
+					}
+					
+					_private["features"][featurename] = feature;
+				}
+				return _private["features"][featurename];
+			}
     	};
     	
     	var Instance = (function(){
@@ -1297,6 +1330,7 @@ var $$ = (
 	            return this;
 	        };
 	        Instance.prototype = _private.setInstanceProperties.call(Instance);
+		
 	        return Instance;
 	     })();
 		     
