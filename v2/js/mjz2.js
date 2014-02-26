@@ -1,5 +1,5 @@
 var $$ = (
-    function(){
+    function($$){
 
     	if ($$) return $$;
     	
@@ -1339,4 +1339,4 @@ var $$ = (
     	return _self;
 
     }
-)();
+)($$||window.$$||undefined);
