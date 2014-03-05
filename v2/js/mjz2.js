@@ -304,6 +304,15 @@ var $$ = (
 	                    return this.sibling(_element.firstChild);
 	                }
 	                
+	                , isParent: function(params){
+	                	var _element = (params && params.element ? params.element : this.elements[0])	                	;
+	                	if (_element==this.elements[0]) return true;
+	                	else {
+	                		if (_element.parentNode && _element.parentNode!=document) return this.isParent({element:_element.parentNode});
+	                		else return false;
+	                	}
+	                }
+	                
 	                , index: function(params){
 	                    var _element = (params && params.element ? params.element : this.elements[0])
 	                    , _group = (params && params.group ? params.group : undefined)
