@@ -1,7 +1,7 @@
 var $$ = (
-    function($$){
+    function(_$$){
 
-    	if ($$) return $$;
+    	if (_$$) return _$$;
     	
     	var _self = function(selector,params){
     		return _private.setInstance(selector,params);
