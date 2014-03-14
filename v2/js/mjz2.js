@@ -1,7 +1,7 @@
 var $$ = (
     function(_$$){
-
-    	if (_$$) return _$$;
+		
+    	if (_$$!=undefined) return _$$;
     	
     	var _self = function(selector,params){
     		return _private.setInstance(selector,params);
@@ -304,13 +304,14 @@ var $$ = (
 	                    return this.sibling(_element.firstChild);
 	                }
 	                
+	                , anchestors: function(params){
+	                	var _element = (params && params.element ? params.element : this.elements[0]);
+	                	_public.getAnchestors(_element);
+	                }
+	                
 	                , isParent: function(params){
-	                	var _element = (params && params.element ? params.element : this.elements[0])	                	;
-	                	if (_element==this.elements[0]) return true;
-	                	else {
-	                		if (_element.parentNode && _element.parentNode!=document) return this.isParent({element:_element.parentNode});
-	                		else return false;
-	                	}
+	                	var _element = (params && params.element ? params.element : this.elements[0]);
+	                	return _public.isParent(_element,this.elements[0]);
 	                }
 	                
 	                , index: function(params){
@@ -844,6 +845,25 @@ var $$ = (
 	            _group = null;
 	            return i;
 	        }
+	        
+	        , isParent: function(element,parent){
+            	if (element!=undefined && parent!=undefined){
+	            	if (element==parent) return true;
+	            	else {
+	            		if (element.parentNode && element.parentNode!=document) return _public.isParent(element.parentNode,parent);
+	            		else return false;
+	            	}
+            	} else return false;
+            }
+            
+            , getAnchestors: function(element){
+				var _anchestors = [];
+				while (element.parentNode.tagName!=undefined && element.tagName.toLowerCase()!="body"){
+					_anchestors.splice(0,0,element);
+					element = element.parentNode;
+				}
+				return _anchestors;
+			}
 	        
 	        , setFunctionFormat: function(string){
 	            for(var exp=/-([a-z])/;exp.test(string);string=string.replace(exp,RegExp.$1.toUpperCase()));
